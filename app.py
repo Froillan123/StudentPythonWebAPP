@@ -82,24 +82,30 @@ def add_student_route():
         level = request.form.get('level')
         image_data = request.form.get('image_data')  # Base64 image data
 
+        # Logging for debugging
+        app.logger.debug("Received form data: %s", request.form)
+
         if not idno or not lastname or not firstname or not course or not level or not image_data:
             return jsonify({'status': 'error', 'message': 'All fields are required!'}), 400
 
-        # Check if the student already exists
-        if student_exists(idno):  # Implement this function to check if a student exists
+        if student_exists(idno):  # Ensure this function is implemented
             return jsonify({'status': 'error', 'message': 'Student with this ID already exists!'}), 400
 
-        # Decode and save image
-        img_data = base64.b64decode(image_data.split(",")[1])
-        image_path = f'static/images/{idno}_profile.jpg'
-        with open(image_path, 'wb') as f:
-            f.write(img_data)
+        try:
+            # Decode and save image
+            img_data = base64.b64decode(image_data.split(",")[1])
+            image_path = f'static/images/{idno}_profile.jpg'
+            with open(image_path, 'wb') as f:
+                f.write(img_data)
 
-        add_student(idno, lastname, firstname, course, level, image_path)
-
-        return jsonify({'status': 'success'})
+            add_student(idno, lastname, firstname, course, level, image_path)
+            return jsonify({'status': 'success'})
+        except Exception as e:
+            app.logger.error("Error adding student: %s", e)
+            return jsonify({'status': 'error', 'message': 'An error occurred while adding the student.'}), 500
 
     return render_template('addstudents.html', pagetitle="Add Student")
+
 
 @app.route('/update_student', methods=['POST'])
 def update_student():
