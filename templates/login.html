@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="w3-card-4 w3-animate-top w3-container w3-padding" style="width:50%; margin:auto">
+    <form id="loginForm" action="{{ url_for('login') }}" method="post" novalidate>
+        <p>
+            <label>USERNAME</label>
+            <input type="text" name="username" id="username" class="w3-input w3-border">
+        </p>
+        <p>
+            <label>PASSWORD</label>
+            <input type="password" name="password" id="password" class="w3-input w3-border">
+        </p>
+        <p>
+            <input type="submit" value="Login" class="w3-button w3-blue">
+        </p>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!username || !password) {
+            showError('Both fields are required');
+            return;
+        }
+
+        fetch('{{ url_for("login") }}', {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showError(data.error);
+            } else {
+                window.location.href = data.redirect || "{{ url_for('student_list') }}";
+            }
+        })
+        .catch(error => {
+            showError('An error occurred. Please try again.');
+        });
+    });
+
+    function showError(message) {
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        
+        usernameInput.classList.add('w3-border-red', 'input-error');
+        passwordInput.classList.add('w3-border-red', 'input-error');
+
+        
+        usernameInput.value = '';
+        passwordInput.value = '';
+
+       
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: message
+        }).then(() => {
+            
+            usernameInput.classList.remove('w3-border-red', 'input-error');
+            passwordInput.classList.remove('w3-border-red', 'input-error');
+        });
+    }
+</script>
+
+<style>
+    .input-error {
+        animation: shake 0.3s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25%, 75% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+    }
+
+    @media (max-width: 597px) {
+    .card-container {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

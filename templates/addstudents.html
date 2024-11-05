@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="w3-row-padding">
+    <div class="w3-half">
+        <div class="w3-container w3-padding w3-round-xlarge w3-card-4">
+            <form id="student_form" action="{{ url_for('add_student_route') }}" method="POST">
+                <div id="my_camera" style="width:320px; height:240px; margin:auto"></div>
+                <p>
+                    <label><b>IDNO</b></label>
+                    <input type="text" name="idno" id="idno" class="w3-input" required>
+                </p>
+                <p>
+                    <label><b>LASTNAME</b></label>
+                    <input type="text" name="lastname" id="lastname" class="w3-input" required>
+                </p>
+                <p>
+                    <label><b>FIRSTNAME</b></label>
+                    <input type="text" name="firstname" id="firstname" class="w3-input" required>
+                </p>
+                <p>
+                    <label><b>COURSE</b></label>
+                    <input type="text" name="course" id="course" class="w3-input" required>
+                </p>
+                <p>
+                    <label><b>LEVEL</b></label>
+                    <input type="text" name="level" id="level" class="w3-input" required>
+                </p>
+                <input type="hidden" name="image_data" id="image_data">
+                <button type="button" class="w3-button w3-blue" onclick="take_snapshot()">SNAP</button>
+            </form>
+        </div>
+    </div>
+    <div class="w3-half">
+        <div class="w3-container w3-padding w3-round-xlarge w3-card-4">
+            <div id="my_result" class="w3-center"></div>
+            <table class="w3-table-all">
+                <tr><td>IDNO</td><td><div id="my_idno"></div></td></tr>
+                <tr><td>LASTNAME</td><td><div id="my_lastname"></div></td></tr>
+                <tr><td>FIRSTNAME</td><td><div id="my_firstname"></div></td></tr>
+                <tr><td>COURSE</td><td><div id="my_course"></div></td></tr>
+                <tr><td>LEVEL</td><td><div id="my_level"></div></td></tr>
+            </table>
+            <button type="submit" form="student_form" class="w3-button w3-green w3-margin-top">SAVE</button>
+        </div>
+    </div>
+</div>
+
+{% if error %}
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'ID Number Exists',
+        text: '{{ error }}'
+    });
+</script>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/webcam.min.js') }}"></script>
+<script>
+    Webcam.set({
+        width: 320,
+        height: 240,
+        image_format: 'jpeg',
+        jpeg_quality: 90
+    });
+    Webcam.attach('#my_camera');
+
+    document.getElementById('student_form').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const formData = new FormData(this);
+        
+        fetch("{{ url_for('add_student_route') }}", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Student added successfully!'
+                }).then(() => {
+                    // Reset the form and clear snapshot display
+                    resetForm();
+                    window.location.href = "{{ url_for('student_list') }}"; // Redirect after closing the alert
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while adding the student.'
+                }).then(() => {
+                    resetForm(); // Reset the form even on error
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An unexpected error occurred.'
+            }).then(() => {
+                resetForm(); // Reset the form on catch as well
+            });
+        });
+    });
+
+    function take_snapshot() {
+        const idno = document.getElementById('idno').value;
+        const lastname = document.getElementById('lastname').value;
+        const firstname = document.getElementById('firstname').value;
+        const course = document.getElementById('course').value;
+        const level = document.getElementById('level').value;
+
+        if (idno && lastname && firstname && course && level) {
+            Webcam.snap(data_uri => {
+                document.getElementById('my_result').innerHTML = '<img src="' + data_uri + '"/>';
+                document.getElementById('my_idno').textContent = idno;
+                document.getElementById('my_lastname').textContent = lastname;
+                document.getElementById('my_firstname').textContent = firstname;
+                document.getElementById('my_course').textContent = course;
+                document.getElementById('my_level').textContent = level;
+                document.getElementById('image_data').value = data_uri; 
+            });
+        } else {
+            Swal.fire({ icon: 'warning', title: 'Incomplete Information', text: 'Fill in all fields before taking a snapshot.' });
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('student_form').reset(); // Reset the form fields
+        document.getElementById('my_result').innerHTML = ''; // Clear the image display
+        document.getElementById('my_idno').textContent = '';
+        document.getElementById('my_lastname').textContent = '';
+        document.getElementById('my_firstname').textContent = '';
+        document.getElementById('my_course').textContent = '';
+        document.getElementById('my_level').textContent = '';
+    }
+</script>
+{% endblock %}
