@@ -1,10 +1,31 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    /* Styles for responsiveness */
+    .w3-half {
+        margin-top: 3rem; /* Set margin-top for right half */
+    }
+
+    #my_camera {
+        width: 100%; /* Set camera width to 100% */
+        height: auto; /* Adjust height automatically */
+    }
+
+    /* Media query for screens smaller than 409px */
+    @media screen and (max-width: 409px) {
+      
+        #my_camera {
+            width: 100vw; /* Ensure camera section is responsive */
+            height: auto; /* Adjust height automatically */
+        }
+    }
+</style>
+
 <div class="w3-row-padding">
     <div class="w3-half">
         <div class="w3-container w3-padding w3-round-xlarge w3-card-4">
             <form id="student_form" action="{{ url_for('add_student_route') }}" method="POST">
-                <div id="my_camera" style="width:320px; height:240px; margin:auto"></div>
+                <div id="my_camera" style="margin:auto"></div>
                 <p>
                     <label><b>IDNO</b></label>
                     <input type="text" name="idno" id="idno" class="w3-input" required>

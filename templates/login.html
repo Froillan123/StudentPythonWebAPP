@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="w3-card-4 w3-animate-top w3-container w3-padding" style="width:50%; margin:auto">
+<div class="w3-card-4 w3-animate-top w3-container w3-padding card-container">
     <form id="loginForm" action="{{ url_for('login') }}" method="post" novalidate>
         <p>
             <label>USERNAME</label>
@@ -11,7 +11,7 @@
             <input type="password" name="password" id="password" class="w3-input w3-border">
         </p>
         <p>
-            <input type="submit" value="Login" class="w3-button w3-blue">
+            <input type="submit" value="Login" class="w3-button w3-blue w3-border-red">
         </p>
     </form>
 </div>
@@ -49,21 +49,17 @@
         const usernameInput = document.getElementById('username');
         const passwordInput = document.getElementById('password');
 
-        
         usernameInput.classList.add('w3-border-red', 'input-error');
         passwordInput.classList.add('w3-border-red', 'input-error');
 
-        
         usernameInput.value = '';
         passwordInput.value = '';
 
-       
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
             text: message
         }).then(() => {
-            
             usernameInput.classList.remove('w3-border-red', 'input-error');
             passwordInput.classList.remove('w3-border-red', 'input-error');
         });
@@ -81,10 +77,15 @@
         50% { transform: translateX(5px); }
     }
 
-    @media (max-width: 597px) {
     .card-container {
-        width: 100%;
+        width: 50%;
+        margin: auto;
     }
-}
+
+    @media (max-width: 574px) {
+        .card-container {
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}

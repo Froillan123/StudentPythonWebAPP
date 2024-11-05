@@ -101,9 +101,6 @@ def add_student_route():
 
     return render_template('addstudents.html', pagetitle="Add Student")
 
-
-
-
 @app.route('/update_student', methods=['POST'])
 def update_student():
     idno = request.form['idno']
