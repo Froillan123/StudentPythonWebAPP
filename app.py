@@ -6,12 +6,11 @@ import os
 import base64
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.config
 
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['SESSION_PERMANENT'] = False
 Session(app)
-
 
 def userlogin(username: str, password: str) -> bool:
     sql = "SELECT * FROM users WHERE username = ? AND password = ?"
@@ -64,7 +63,7 @@ def student_list():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    flash('You have been logged out.', 'info')  # Optional: Add a flash message
+    flash('You have been logged out.', 'info') 
     return redirect(url_for('login'))
 
 @app.route('/')
@@ -80,9 +79,7 @@ def add_student_route():
         firstname = request.form.get('firstname')
         course = request.form.get('course')
         level = request.form.get('level')
-        image_data = request.form.get('image_data')  # Base64 image data
-
-        # Logging for debugging
+        image_data = request.form.get('image_data')  
         app.logger.debug("Received form data: %s", request.form)
 
         if not idno or not lastname or not firstname or not course or not level or not image_data:
@@ -92,7 +89,6 @@ def add_student_route():
             return jsonify({'status': 'error', 'message': 'Student with this ID already exists!'}), 400
 
         try:
-            # Decode and save image
             img_data = base64.b64decode(image_data.split(",")[1])
             image_path = f'static/images/{idno}_profile.jpg'
             with open(image_path, 'wb') as f:
@@ -114,8 +110,6 @@ def update_student():
     firstname = request.form['firstname']
     course = request.form['course']
     level = request.form['level']
-
-    # Update the database record
     sql = "UPDATE students SET lastname = ?, firstname = ?, course = ?, level = ? WHERE idno = ?"
     db = connect('students.db')
     cursor = db.cursor()
@@ -130,14 +124,9 @@ def update_student():
 @app.route('/delete_student', methods=['POST'])
 def delete_student():
     idno = request.form['idno']
-    
-    # Retrieve the student's image path
     image_path = get_student_image_path(idno)
     
-    # Delete the student record from the database
     delete_student_record(idno)
-    
-    # Remove the image file if it exists
     if image_path and os.path.exists(image_path):
         try:
             os.remove(image_path)
@@ -153,8 +142,6 @@ def after_request(response):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
-
-
 
 if __name__ == '__main__':
     app.run(debug=True) 

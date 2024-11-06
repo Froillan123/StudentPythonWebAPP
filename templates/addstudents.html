@@ -80,8 +80,8 @@
 <script src="{{ url_for('static', filename='js/webcam.min.js') }}"></script>
 <script>
     Webcam.set({
-        width: 320,
-        height: 240,
+        width: 300,
+        height: 250,
         image_format: 'jpeg',
         jpeg_quality: 90
     });
@@ -104,9 +104,9 @@
                     title: 'Success',
                     text: 'Student added successfully!'
                 }).then(() => {
-                    // Reset the form and clear snapshot display
+                
                     resetForm();
-                    window.location.href = "{{ url_for('student_list') }}"; // Redirect after closing the alert
+                    window.location.href = "{{ url_for('student_list') }}"; 
                 });
             } else {
                 Swal.fire({
@@ -114,7 +114,7 @@
                     title: 'Error',
                     text: 'An error occurred while adding the student.'
                 }).then(() => {
-                    resetForm(); // Reset the form even on error
+                    resetForm(); 
                 });
             }
         })
@@ -124,7 +124,7 @@
                 title: 'Error',
                 text: 'An unexpected error occurred.'
             }).then(() => {
-                resetForm(); // Reset the form on catch as well
+                resetForm(); 
             });
         });
     });

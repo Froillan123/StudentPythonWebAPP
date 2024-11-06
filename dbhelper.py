@@ -5,9 +5,8 @@ import sqlite3
 DATABASE = 'students.db'
 
 def get_db_connection():
-    """Establishes a new database connection."""
     db = connect(DATABASE)
-    db.row_factory = Row  # Set the row factory to Row for dictionary-like access
+    db.row_factory = Row  
     return db
 
 
@@ -42,9 +41,9 @@ def add_student(idno, lastname, firstname, course, level, image):
                  VALUES (?, ?, ?, ?, ?, ?)'''
         cursor.execute(sql, (idno, lastname, firstname, course, level, image))
         connection.commit()
-        return True  # Indicate success
+        return True  
     except sqlite3.IntegrityError:
-        return False  # Indicate failure due to unique constraint
+        return False  
     finally:
         connection.close()
 
